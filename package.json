@@ -1,0 +1,11 @@
+{
+  "name": "omind-manager",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node -e \"console.log('OMIND static build: ready')\""
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
