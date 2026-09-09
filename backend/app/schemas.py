@@ -4,10 +4,21 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 
+class WorkspaceResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    plan: str
+    analysis_limit: int
+    analyses_used: int
+    remaining: int
+
+
 class AnalysisResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
+    workspace_id: UUID
     filename: str
     question: str
     rows: int
@@ -27,6 +38,12 @@ class DecisionCreate(BaseModel):
     decision: str = Field(min_length=1)
     expected_outcome: str = Field(min_length=1)
     experiment: str = Field(min_length=1)
+
+
+class DecisionOutcomeUpdate(BaseModel):
+    actual_outcome: str = Field(min_length=1)
+    lesson: str = Field(min_length=1)
+    status: str = Field(pattern='^(success|incomplete|failure|retest)$')
 
 
 class DecisionResponse(DecisionCreate):
