@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import * as XLSX from 'xlsx';
 import { profileRows, type Analysis, type Row } from '../lib/omind-engine';
 
@@ -15,6 +15,7 @@ const PERSONAS: Record<string, FilePersona> = {
   json: { key: 'json', label: 'JSON', icon: '{}', accent: '#F2C94C', message: 'ساختار JSON را بررسی می‌کنم و نقش فیلدها را درمی‌آورم.' },
   default: { key: 'default', label: 'OMIND', icon: 'O', accent: '#64A9FF', message: 'من آماده‌ام. داده را بده تا از مشاهده به تصمیم برویم.' },
 };
+const API_BASE = process.env.NEXT_PUBLIC_OMIND_API_URL?.replace(/\/$/, '');
 function personaFor(name?: string) { const n = (name ?? '').toLowerCase(); if (n.endsWith('.xlsx') || n.endsWith('.xls')) return PERSONAS.excel; if (n.endsWith('.csv')) return PERSONAS.csv; if (n.endsWith('.json')) return PERSONAS.json; return PERSONAS.default; }
 
 async function parseFile(file: File): Promise<Row[]> {
@@ -23,11 +24,63 @@ async function parseFile(file: File): Promise<Row[]> {
   const workbook = XLSX.read(buffer, { type: 'array', cellDates: true }); const sheet = workbook.Sheets[workbook.SheetNames[0]]; return XLSX.utils.sheet_to_json<Row>(sheet, { defval: null, raw: true });
 }
 
+function getWorkspaceId() {
+  const key = 'omind-workspace-id';
+  const existing = window.localStorage.getItem(key);
+  if (existing) return existing;
+  const created = crypto.randomUUID();
+  window.localStorage.setItem(key, created);
+  return created;
+}
+
 export default function Home() {
-  const [tab, setTab] = useState<Tab>('workspace'); const [file, setFile] = useState<File | null>(null); const [role, setRole] = useState('manager'); const [question, setQuestion] = useState(''); const [analysis, setAnalysis] = useState<Analysis | null>(null); const [sessions, setSessions] = useState<Session[]>([]); const [busy, setBusy] = useState(false); const [error, setError] = useState('');
-  const remaining = Math.max(0, 3 - sessions.length); const roleLabel = useMemo(() => ({ manager: 'مدیر', sales: 'فروش', finance: 'مالی', hr: 'منابع انسانی', ops: 'عملیات' }[role] ?? 'مدیر'), [role]); const persona = useMemo(() => personaFor(file?.name), [file?.name]);
-  async function analyze() { if (!file) return setError('ابتدا یک فایل CSV، XLSX، XLS یا JSON انتخاب کن.'); if (remaining === 0) return setError('سهمیه نسخه آزمایشی تمام شده است.'); setBusy(true); setError(''); try { const rows = await parseFile(file); if (!rows.length) throw new Error('فایل داده قابل تحلیل ندارد.'); const seed = profileRows(rows); const q = question.trim() || seed.questions[0] || 'مهم‌ترین مسئله این داده چیست؟'; const result = profileRows(rows, q); const session = { id: crypto.randomUUID(), file: file.name, question: q, analysis: result, createdAt: new Date().toLocaleString('fa-IR') }; setAnalysis(result); setQuestion(q); setSessions(prev => [session, ...prev]); } catch (e) { setError(e instanceof Error ? e.message : 'خواندن فایل ناموفق بود.'); } finally { setBusy(false); } }
-  function selectFile(next: File | null) { setFile(next); setAnalysis(null); setError(''); } function reset() { setFile(null); setAnalysis(null); setQuestion(''); setError(''); }
+  const [tab, setTab] = useState<Tab>('workspace'); const [file, setFile] = useState<File | null>(null); const [role, setRole] = useState('manager'); const [question, setQuestion] = useState(''); const [analysis, setAnalysis] = useState<Analysis | null>(null); const [sessions, setSessions] = useState<Session[]>([]); const [busy, setBusy] = useState(false); const [error, setError] = useState(''); const [workspaceId, setWorkspaceId] = useState(''); const [serverRemaining, setServerRemaining] = useState<number | null>(null);
+  const remaining = serverRemaining ?? Math.max(0, 3 - sessions.length); const roleLabel = useMemo(() => ({ manager: 'مدیر', sales: 'فروش', finance: 'مالی', hr: 'منابع انسانی', ops: 'عملیات' }[role] ?? 'مدیر'), [role]); const persona = useMemo(() => personaFor(file?.name), [file?.name]);
+
+  useEffect(() => {
+    const id = getWorkspaceId();
+    setWorkspaceId(id);
+    if (!API_BASE) return;
+    fetch(`${API_BASE}/workspaces/${id}`).then(async r => r.ok ? r.json() : null).then(data => data && setServerRemaining(data.remaining)).catch(() => undefined);
+    fetch(`${API_BASE}/workspaces/${id}/analyses`).then(async r => r.ok ? r.json() : []).then(items => {
+      const restored: Session[] = items.map((item: { id: string; filename: string; question: string; created_at: string; result: Analysis }) => ({ id: item.id, file: item.filename, question: item.question, analysis: item.result, createdAt: new Date(item.created_at).toLocaleString('fa-IR') }));
+      setSessions(restored);
+    }).catch(() => undefined);
+  }, []);
+
+  async function analyze() {
+    if (!file) return setError('ابتدا یک فایل CSV، XLSX، XLS یا JSON انتخاب کن.');
+    if (remaining === 0) return setError('سهمیه نسخه آزمایشی تمام شده است.');
+    setBusy(true); setError('');
+    try {
+      const rows = await parseFile(file);
+      if (!rows.length) throw new Error('فایل داده قابل تحلیل ندارد.');
+      const result = profileRows(rows, question.trim());
+      const q = question.trim() || result.questions[0] || 'مهم‌ترین مسئله این داده چیست؟';
+
+      if (API_BASE && workspaceId) {
+        const quotaResponse = await fetch(`${API_BASE}/workspaces/${workspaceId}/consume-analysis`, { method: 'POST' });
+        if (!quotaResponse.ok) throw new Error(quotaResponse.status === 402 ? 'سهمیه نسخه آزمایشی تمام شده است.' : 'سرویس ذخیره‌سازی در دسترس نیست.');
+        const quota = await quotaResponse.json();
+        const body = new FormData(); body.append('file', file); body.append('question', q); body.append('workspace_id', workspaceId); body.append('result_json', JSON.stringify(result));
+        const saved = await fetch(`${API_BASE}/analyses`, { method: 'POST', body });
+        if (!saved.ok) throw new Error('ذخیره تحلیل در سرور ناموفق بود.');
+        setServerRemaining(quota.remaining);
+        const server = await saved.json();
+        const session = { id: server.id, file: file.name, question: q, analysis: result, createdAt: new Date(server.created_at).toLocaleString('fa-IR') };
+        setSessions(prev => [session, ...prev.filter(s => s.id !== session.id)]);
+      } else {
+        const session = { id: crypto.randomUUID(), file: file.name, question: q, analysis: result, createdAt: new Date().toLocaleString('fa-IR') };
+        setSessions(prev => [session, ...prev]);
+      }
+      setAnalysis(result); setQuestion(q);
+    } catch (e) { setError(e instanceof Error ? e.message : 'خواندن فایل ناموفق بود.'); }
+    finally { setBusy(false); }
+  }
+
+  function selectFile(next: File | null) { setFile(next); setAnalysis(null); setError(''); }
+  function reset() { setFile(null); setAnalysis(null); setQuestion(''); setError(''); }
+
   return <main className="app-shell" style={{ '--persona-accent': persona.accent } as React.CSSProperties}>
     <header className="topbar"><button className="brand" onClick={() => setTab('workspace')} aria-label="OMIND home"><span className="brand-mark">O</span><span><strong>OMIND</strong><small>DATA → DECISION</small></span></button><nav>{tabs.map(t => <button key={t} className={tab === t ? 'active' : ''} onClick={() => setTab(t)}>{t === 'workspace' ? 'تحلیل‌گر' : t === 'history' ? 'حافظه تصمیم' : 'قیمت'}</button>)}</nav><div className="quota"><span>FREE</span><b>{remaining}</b><small>تحلیل</small></div></header>
     {tab === 'workspace' && <section className="workspace-page">
@@ -35,7 +88,7 @@ export default function Home() {
       <div className="workspace-grid"><div className="panel main-panel"><div className="panel-head"><div><span className="eyebrow">01 / INGEST</span><h2>داده‌ات را وارد کن</h2></div><button className="ghost" onClick={reset}>پاک کردن</button></div><label className="dropzone" data-persona={persona.key}><input type="file" accept=".csv,.xlsx,.xls,.json" onChange={e => selectFile(e.target.files?.[0] ?? null)} /><span className="upload-icon">↑</span><strong>{file ? file.name : 'فایل را اینجا بکش یا انتخاب کن'}</strong><small>CSV · XLSX · XLS · JSON — پردازش نمونه فعلاً داخل مرورگر انجام می‌شود.</small></label><div className="agent-status"><span className="status-dot" /><b>{persona.label}</b><span>{persona.message}</span></div><div className="controls"><label>نقش شما<select value={role} onChange={e => setRole(e.target.value)}><option value="manager">مدیر</option><option value="sales">فروش</option><option value="finance">مالی</option><option value="hr">منابع انسانی</option><option value="ops">عملیات</option></select></label><label className="wide">سؤال یا هدف تحلیل<textarea value={question} onChange={e => setQuestion(e.target.value)} placeholder={`مثلاً: مهم‌ترین مسئله ${roleLabel} در این داده چیست؟`} rows={3} /></label></div>{analysis && <div className="question-list"><span className="eyebrow">QUESTIONS</span>{analysis.questions.map(q => <button key={q} onClick={() => setQuestion(q)}>{q}</button>)}</div>}{error && <div className="error">{error}</div>}<button className="primary full" onClick={analyze} disabled={busy || remaining === 0}>{busy ? 'در حال تحلیل…' : 'اجرای تحلیل ←'}</button></div>
         <aside className="panel engine-panel"><span className="eyebrow">OMIND ENGINE</span><h3>از داده تا تصمیم</h3><div className="pipeline">{['Intake','Observe','Decompose','Pattern','Hypothesis','Causality','Decision','Scenarios','Experiment','Action','Feedback','Loop'].map((x, i) => <div key={x}><i>{String(i + 1).padStart(2, '0')}</i><span>{x}</span></div>)}</div><p>هسته تحلیل deterministic و قابل توضیح است؛ مدل زبانی بعداً به‌عنوان لایه تقویتی به آن متصل می‌شود.</p></aside></div></section>}
     {tab === 'workspace' && analysis && <AnalysisView analysis={analysis} question={question} />}
-    {tab === 'history' && <section className="content-page"><span className="eyebrow">DECISION MEMORY</span><h1>حافظه تحلیل‌ها</h1><p>در این مرحله تاریخچه داخل همین session نگهداری می‌شود؛ persistence سمت سرور در لایه بعدی اضافه خواهد شد.</p>{sessions.length ? sessions.map(s => <article className="history-card" key={s.id}><div><b>{s.file}</b><small>{s.createdAt}</small></div><h3>{s.question}</h3><span>Health {s.analysis.health}/100 · Confidence {s.analysis.confidence}%</span></article>) : <div className="empty">هنوز تحلیلی اجرا نشده.</div>}</section>}
+    {tab === 'history' && <section className="content-page"><span className="eyebrow">DECISION MEMORY</span><h1>حافظه تحلیل‌ها</h1><p>{API_BASE ? 'تاریخچه از workspace سرور بارگذاری می‌شود و در صورت قطع سرویس، تحلیل جاری همچنان محلی قابل مشاهده است.' : 'تاریخچه در همین session نگهداری می‌شود.'}</p>{sessions.length ? sessions.map(s => <article className="history-card" key={s.id}><div><b>{s.file}</b><small>{s.createdAt}</small></div><h3>{s.question}</h3><span>Health {s.analysis.health}/100 · Confidence {s.analysis.confidence}%</span></article>) : <div className="empty">هنوز تحلیلی اجرا نشده.</div>}</section>}
     {tab === 'pricing' && <section className="content-page pricing-page"><span className="eyebrow">PAY WHEN VALUE IS PROVEN</span><h1>سه تحلیل را رایگان امتحان کن.</h1><div className="prices"><Price title="تحلیل تکی" price="۳۹۰٬۰۰۰" detail="یک تحلیل کامل فایل"/><Price title="Pro" price="۲٬۴۹۰٬۰۰۰" detail="۳۰ تحلیل + حافظه" featured/><Price title="Team" price="۶٬۹۰۰٬۰۰۰" detail="تا ۱۰ کاربر + فضای تیمی"/></div></section>}
   </main>;
 }
