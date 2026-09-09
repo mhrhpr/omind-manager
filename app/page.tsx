@@ -4,71 +4,71 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 const LOOP = [
-  ['01','Observe','چه چیزی تغییر کرده؟','سیگنال واقعی را از بین صدها ردیف داده بیرون بکش.'],
-  ['02','Prioritize','چه چیزی مهم‌تر است؟','بدان کدام مسئله همین امروز ارزش توجه دارد.'],
-  ['03','Decide','حالا چه کنیم؟','به یک اقدام مشخص، مالک مشخص و نتیجه مورد انتظار برس.'],
-  ['04','Learn','چه چیزی یاد گرفتیم؟','نتیجه واقعی را برگردان تا تصمیم بعدی بهتر شود.'],
+  ['01','Observe','اول بفهم چه چیزی تغییر کرده','سیگنال واقعی را از نویز جدا می‌کنیم.'],
+  ['02','Prioritize','بعد می‌فهمیم چه چیزی مهم‌تر است','اثر، اهمیت و کیفیت شواهد را کنار هم می‌گذاریم.'],
+  ['03','Decide','بعد تصمیم را قابل اجرا می‌کنیم','تصمیم، مالک، آزمایش و نتیجه‌ی مورد انتظار مشخص می‌شود.'],
+  ['04','Learn','و در آخر یاد می‌گیریم','Outcome واقعی برمی‌گردد تا حافظه‌ی سازمانی ساخته شود.'],
 ];
 
 const SOLUTIONS = [
-  ['مدیریت','Management','در چند دقیقه ببین کدام KPI واقعاً به تصمیم نیاز دارد.'],
-  ['فروش','Sales','افت، فرصت و حساب‌های حساس را قبل از اینکه دیر شود پیدا کن.'],
-  ['مالی','Finance','انحراف‌های مهم را از نویز جدا کن و اولویت بده.'],
-  ['منابع انسانی','People','الگوهای مهم نیروی انسانی را به اقدام قابل پیگیری تبدیل کن.'],
-  ['عملیات','Operations','گلوگاه، تأخیر و ریسک را از دل داده‌های روزمره پیدا کن.'],
+  ['01','MANAGEMENT','مدیریت','بدان امروز کدام KPI واقعاً نیاز به تصمیم دارد.'],
+  ['02','SALES','فروش','افت، فرصت و حساب‌های حساس را زودتر پیدا کن.'],
+  ['03','FINANCE','مالی','انحراف‌های مهم را از نویز جدا و اولویت‌بندی کن.'],
+  ['04','PEOPLE','منابع انسانی','الگوهای مهم نیروی انسانی را به اقدام تبدیل کن.'],
+  ['05','OPERATIONS','عملیات','گلوگاه، تأخیر و ریسک را از داده‌ی روزمره بیرون بکش.'],
 ];
 
 export default function LandingPage() {
   const [active, setActive] = useState(0);
-  useEffect(() => { const id = window.setInterval(() => setActive(v => (v + 1) % LOOP.length), 2300); return () => window.clearInterval(id); }, []);
-  return <main className="landing">
-    <header className="site-nav">
-      <Link className="wordmark" href="/"><span>O</span><strong>OMIND</strong></Link>
-      <nav><a href="#product">محصول</a><a href="#solutions">کاربردها</a><a href="#how">جریان تصمیم</a><a href="#proof">چرا OMIND</a><a href="#pricing">قیمت</a></nav>
-      <div className="nav-actions"><Link className="nav-login" href="/login">ورود</Link><Link className="nav-cta" href="/signup">شروع رایگان</Link></div>
+  useEffect(() => { const id = window.setInterval(() => setActive(v => (v + 1) % LOOP.length), 2500); return () => window.clearInterval(id); }, []);
+
+  return <main className="landing-vnext">
+    <header className="ln-nav">
+      <Link href="/" className="ln-brand"><span className="ln-brand-mark">O</span><span className="ln-brand-copy"><strong>OMIND</strong><span>Decision Intelligence</span></span></Link>
+      <nav className="ln-nav-links"><a href="#product">محصول</a><a href="#solutions">کاربردها</a><a href="#loop">جریان تصمیم</a><a href="#proof">اعتماد</a><a href="#pricing">قیمت</a></nav>
+      <div className="ln-nav-actions"><Link href="/login" className="ln-login">ورود</Link><Link href="/signup" className="ln-cta">شروع رایگان</Link></div>
     </header>
 
-    <section className="hero" id="product">
-      <div className="hero-copy">
-        <div className="kicker"><i /> DECISION INTELLIGENCE FOR REAL WORK</div>
-        <h1>هر فایل، یک داستان دارد.<br /><em>OMIND می‌گوید حالا چه کنیم.</em></h1>
-        <p>فایل کاری‌ات را وارد کن. OMIND از دل داده، <b>مهم‌ترین سیگنال</b> را پیدا می‌کند، آن را اولویت می‌دهد و به یک اقدام قابل پیگیری تبدیل می‌کند؛ بدون SQL و بدون غرق‌شدن در dashboard.</p>
-        <div className="hero-actions"><Link className="primary hero-primary" href="/signup">فایل اولت را تحلیل کن <span>←</span></Link><a className="hero-secondary" href="#how">ببین OMIND چطور فکر می‌کند</a></div>
-        <div className="trust-row"><span>CSV</span><span>XLSX</span><span>JSON</span><i /><small>۳ تحلیل رایگان · بدون کارت بانکی · شروع با داده واقعی خودت</small></div>
+    <section className="ln-hero" id="product">
+      <div className="ln-hero-copy">
+        <span className="ln-kicker"><i/> DECISION INTELLIGENCE FOR REAL WORK</span>
+        <h1>از داده عبور کن.<br/><em>به تصمیم برس.</em></h1>
+        <p>OMIND فایل کاری تو را می‌خواند، <b>مهم‌ترین سیگنال</b> را پیدا می‌کند، آن را اولویت می‌دهد و به اقدام بعدی وصل می‌کند؛ بعد نتیجه‌ی واقعی تصمیم را دوباره وارد حافظه می‌کند.</p>
+        <div className="ln-hero-actions"><Link href="/signup" className="ln-primary">اولین فایل را تحلیل کن <span>←</span></Link><a href="#loop" className="ln-secondary">ببین چطور کار می‌کند</a></div>
+        <div className="ln-proof-mini"><span>CSV</span><span>XLSX</span><span>JSON</span><small>۳ تحلیل رایگان · بدون کارت بانکی · با داده‌ی واقعی خودت</small></div>
       </div>
 
-      <div className="hero-visual" aria-label="OMIND decision workspace preview">
-        <div className="glow" />
-        <div className="float-chip chip-one">Signal · Sales ↓ 12.4%</div>
-        <div className="float-chip chip-two">Decision readiness · 81%</div>
-        <div className="decision-window">
-          <div className="window-top"><span>OMIND / Decision Workspace</span><small>LIVE ANALYSIS · 024</small></div>
-          <div className="window-body">
-            <div className="mini-label">WHAT MATTERS NOW</div>
-            <h3>کاهش فروش در منطقه شرق</h3>
-            <p>فروش ۲۸٪ پایین‌تر از baseline ماه قبل است؛ بیشترین اثر از سه حساب کلیدی آمده. سیستم شواهد کافی برای اقدام فوری دارد.</p>
-            <div className="signal-line"><span>Priority / Evidence</span><b>HIGH · 3 SIGNALS</b></div>
-            <div className="window-grid"><div><small>HEALTH</small><strong>92 / 100</strong></div><div><small>CONFIDENCE</small><strong>81%</strong></div></div>
-            <div className="window-action"><span>→</span><div><small>NEXT ACTION</small><b>سه حساب کلیدی را تا جمعه بازبینی کن</b></div></div>
+      <div className="ln-hero-product" aria-label="OMIND product preview">
+        <div className="ln-product-halo" />
+        <div className="ln-float-chip ln-chip-one">Signal <b>Sales ↓ 12.4%</b></div>
+        <div className="ln-float-chip ln-chip-two">Decision readiness <b>81%</b></div>
+        <div className="ln-product-shell">
+          <div className="ln-window-bar"><div className="ln-window-dots"><i/><i/><i/></div><span className="ln-window-meta">OMIND / DECISION WORKSPACE · LIVE</span></div>
+          <div className="ln-product-main">
+            <aside className="ln-product-side"><div className="ln-side-title">WORKSPACE</div><div className="ln-side-item active">⌂ <span>نمای کلی</span></div><div className="ln-side-item">＋ <span>تحلیل جدید</span></div><div className="ln-side-item">◫ <span>تحلیل‌ها</span><b>12</b></div><div className="ln-side-item">◇ <span>تصمیم‌ها</span><b>3</b></div><div className="ln-side-title" style={{marginTop:18}}>MEMORY</div><div className="ln-side-item">✓ <span>کارهای من</span></div><div className="ln-side-item">∞ <span>حافظه تصمیم</span></div></aside>
+            <div className="ln-product-content">
+              <div className="ln-product-top"><div><small>TODAY’S FOCUS</small><h3>کاهش فروش در منطقه شرق</h3><p>فروش این ناحیه ۲۸٪ پایین‌تر از baseline است و سه حساب کلیدی بیشترین اثر را دارند.</p></div><span className="ln-status">● LIVE</span></div>
+              <div className="ln-score-row"><div className="ln-score"><small>DATA HEALTH</small><b>92</b></div><div className="ln-score"><small>CONFIDENCE</small><b>81%</b></div><div className="ln-score"><small>OPEN DECISIONS</small><b>3</b></div></div>
+              <div className="ln-signal-card"><div className="ln-signal-head"><span>WHAT MATTERS</span><b>HIGH · 3 SIGNALS</b></div><div className="ln-signal-title">سه حساب کلیدی عامل اصلی افت هستند</div><div className="ln-signal-text">قبل از تغییر broad pricing، این segment را بررسی کن؛ شواهد فعلی برای یک intervention محدود کافی است.</div><div className="ln-bar"><i/></div></div>
+              <div className="ln-next-card"><small>NEXT ACTION</small><b>سه حساب کلیدی را تا جمعه بازبینی کن و نتیجه را در Decision Memory ثبت کن.</b><div className="ln-next-meta"><span>OWNER · SALES</span><span>EXPERIMENT</span><span>FOLLOW-UP</span></div></div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section className="proof-strip" id="proof"><div><b>گزارش به تو می‌گوید چه شد؛ تصمیم به تو می‌گوید چه کنی.</b><span>OMIND فاصله‌ی بین داده و اقدام را کوتاه می‌کند و نتیجه‌ی تصمیم را هم به سیستم برمی‌گرداند.</span></div><div className="proof-stats"><b>01</b><span>Evidence-first</span><b>02</b><span>Traceable</span><b>03</b><span>Outcome-aware</span></div></section>
+    <section className="ln-strip"><div><b>گزارش نیست؛ سیستم تصمیم است.</b><span>OMIND فاصله‌ی بین داده و اقدام را کم می‌کند.</span></div><div><strong>Evidence-first</strong><small>هر insight به داده وصل است.</small></div><div><strong>Traceable</strong><small>مسیر reasoning قابل مشاهده است.</small></div><div><strong>Outcome-aware</strong><small>نتیجه به حافظه برمی‌گردد.</small></div></section>
 
-    <section className="decision-intro"><div><small>THE PRODUCT IDEA</small><h2>داده بیشتر، الزاماً تصمیم بهتر نمی‌سازد.<br />وضوح می‌سازد.</h2></div><p>OMIND به جای اینکه تو را با ده‌ها نمودار تنها بگذارد، مسیر را از «چه اتفاقی افتاد؟» به «چه چیزی مهم است؟» و بعد «الان چه کنیم؟» می‌برد. خروجی اصلی یک chart نیست؛ یک تصمیم قابل دفاع است.</p></section>
+    <section className="ln-section" id="loop"><div className="ln-section-head"><div><span className="ln-eyebrow">THE OMIND LOOP</span><h2>یک حلقه‌ی واقعی برای تصمیم‌گیری.</h2><p>از فایل خام شروع می‌کنیم و به تصمیمی می‌رسیم که فردا می‌توانی نتیجه‌اش را بسنجی.</p></div><span className="ln-section-note">هر مرحله خروجی مشخصی به مرحله بعد می‌دهد؛ سیستم برای زیبایی dashboard طراحی نشده، برای باز کردن bottleneck تصمیم طراحی شده است.</span></div><div className="ln-loop">{LOOP.map(([n,t,d,x],i)=><article key={t} className={`ln-loop-card ln-step-${i+1}`}><strong>{n}</strong><h3>{d}</h3><p>{x}</p><span>{t}</span></article>)}</div></section>
 
-    <section className="flow-section" id="how"><div className="section-intro"><small>THE OMIND LOOP</small><h2>از فایل خام تا تصمیمی که بتوانی فردا نتیجه‌اش را بسنجی.</h2><p>چهار مرحله، یک حلقه. هر مرحله چیزی به مرحله بعدی تحویل می‌دهد و outcome واقعی دوباره وارد حافظه تصمیم می‌شود.</p></div><div className="flow-grid">{LOOP.map(([n,t,d,x],i)=><div key={t} className={`flow-card ${i===active?'active':''}`}><small>{n}</small><b>{d}</b><span>{x}</span><div className="flow-dot" /><em>{t}</em></div>)}</div></section>
+    <section className="ln-section" id="solutions"><div className="ln-section-head"><div><span className="ln-eyebrow">BUSINESS QUESTIONS</span><h2>کاربر ابزار نمی‌خرد؛ جواب می‌خواهد.</h2><p>به‌جای فهرست قابلیت‌ها، سناریوهایی را نشان می‌دهیم که تیم‌ها واقعاً برایشان تصمیم می‌گیرند.</p></div></div><div className="ln-solutions">{SOLUTIONS.map(([n,en,fa,desc],i)=><article key={en} className={`ln-solution ln-sol-${i+1}`}><small>{n} · {en}</small><h3>{fa}</h3><p>{desc}</p><Link href="/signup">این سناریو را امتحان کن ←</Link></article>)}</div></section>
 
-    <section className="solutions-section" id="solutions"><div className="section-intro"><small>DESIGNED AROUND BUSINESS QUESTIONS</small><h2>تو با «داده» وارد می‌شوی؛ با «مسئله» کار می‌کنی.</h2><p>OMIND خودش را با منوی ابزارها معرفی نمی‌کند؛ با سوال‌هایی که هر روز مدیران و تیم‌ها باید جواب بدهند.</p></div><div className="solution-grid">{SOLUTIONS.map(([fa,en,desc],i)=><article className={`solution-card solution-${i}`} key={en}><span>0{i+1}</span><small>{en}</small><h3>{fa}</h3><p>{desc}</p><Link href="/signup">این سناریو را امتحان کن <b>←</b></Link></article>)}</div></section>
+    <section className="ln-section" id="proof"><div className="ln-section-head"><div><span className="ln-eyebrow">TRUST & CLARITY</span><h2>اعتماد را با حرف نمی‌سازیم؛ با trace می‌سازیم.</h2><p>معماری OMIND از شواهد و قواعد شروع می‌شود. هرجا داده کافی نباشد، عدم‌قطعیت باید دیده شود، نه اینکه با متن قانع‌کننده پوشانده شود.</p></div></div><div className="ln-proof"><div className="ln-proof-main"><span className="ln-eyebrow">WHY IT FEELS DIFFERENT</span><h3>محصول باید به کاربر دلیل بدهد، نه فقط جواب.</h3><p>در هر تحلیل، داده، سیگنال، اولویت، تصمیم و outcome در یک زنجیره قرار می‌گیرند. این ساختار است که به‌مرور Decision Memory می‌سازد.</p><div className="ln-proof-grid"><div className="ln-proof-item"><b>01</b><strong>Evidence</strong><span>ریشه‌ی هر insight در داده و محاسبه مشخص است.</span></div><div className="ln-proof-item"><b>02</b><strong>Priority</strong><span>مهم‌ترین مسئله قبل از هر action مشخص می‌شود.</span></div><div className="ln-proof-item"><b>03</b><strong>Memory</strong><span>Outcome و Lesson برای تصمیم‌های بعدی می‌مانند.</span></div></div></div><div className="ln-proof-aside"><div className="ln-quote"><span className="ln-eyebrow">PRODUCT PRINCIPLE</span><p>«وقتی شواهد ضعیف است، OMIND باید uncertainty را زیاد کند؛ نه اعتمادبه‌نفس متن را.»</p><footer>Evidence-first decision design</footer></div><div className="ln-trust-row"><div className="ln-trust"><strong>01</strong><span>Readable trace</span></div><div className="ln-trust"><strong>02</strong><span>Real workspace</span></div><div className="ln-trust"><strong>03</strong><span>Decision loop</span></div><div className="ln-trust"><strong>04</strong><span>Outcome memory</span></div></div></div></div></section>
 
-    <section className="feature-section"><div className="feature-copy"><small>WHY IT IS DIFFERENT</small><h2>AI اینجا جواب را قشنگ نمی‌کند؛ تصمیم را قابل بررسی می‌کند.</h2><p>هسته‌ی OMIND از داده، قواعد و شواهد شروع می‌کند. وقتی شواهد کافی نیست، سیستم عدم‌قطعیت را نشان می‌دهد و به جای ساختن یک جواب خیالی، سؤال یا آزمایش بعدی پیشنهاد می‌کند.</p><div className="feature-points"><div><b>01</b><span><strong>Evidence</strong> هر insight باید به داده و محاسبه برسد.</span></div><div><b>02</b><span><strong>Priority</strong> مسئله‌ها بر اساس اثر، اهمیت و شواهد مرتب می‌شوند.</span></div><div><b>03</b><span><strong>Decision Memory</strong> مسئله، تصمیم، outcome و lesson کنار هم می‌مانند.</span></div><div><b>04</b><span><strong>Learning Loop</strong> نتیجه‌ی واقعی، تصمیم بعدی را بهتر می‌کند.</span></div></div></div><div className="architect-card"><div className="arch-head"><span>DECISION GRAPH</span><i>CONNECTED</i></div><div className="arch-node main">DATA</div><div className="arch-link l1" /><div className="arch-node n1">SIGNAL</div><div className="arch-link l2" /><div className="arch-node n2">PRIORITY</div><div className="arch-link l3" /><div className="arch-node n3">DECISION</div><div className="arch-link l4" /><div className="arch-node n4">OUTCOME</div></div></section>
+    <section className="ln-section"><div className="ln-architecture"><div className="ln-arch-copy"><span className="ln-eyebrow">UNDER THE SURFACE</span><h3>یک لایه UI نیست؛ یک سیستم تصمیم است.</h3><p>کاربر می‌تواند با یک فایل شروع کند؛ معماری زیر آن برای context، data، decisions و organizational memory ساخته می‌شود.</p><div className="ln-arch-points"><div className="ln-arch-point"><b>01</b><div><strong>Data context</strong><span>فایل، schema، health و relationshipهای قابل فهم.</span></div></div><div className="ln-arch-point"><b>02</b><div><strong>Reasoning core</strong><span>Observe → Decompose → Pattern → Hypothesis → Decision.</span></div></div><div className="ln-arch-point"><b>03</b><div><strong>Learning loop</strong><span>Expected → Actual → Error → Lesson.</span></div></div></div></div><div className="ln-arch-visual"><div className="ln-graph-grid"/><span className="ln-arch-badge">SYSTEM CONNECTED</span><div className="ln-graph-shell"><div className="ln-graph-line"/>{[['DATA','فایل واقعی','n1'],['SIGNAL','نشانه','n2'],['PRIORITY','اهمیت','n3'],['DECISION','تصمیم','n4'],['OUTCOME','نتیجه','n5'],['MEMORY','حافظه','n6']].map(([a,b,c])=><div key={a} className={`ln-node ${c}`}><small>{a}</small><strong>{b}</strong></div>)}</div></div></div></section>
 
-    <section className="proof-section"><div className="proof-section-head"><div><small>DESIGNED FOR ADOPTION</small><h2>شروعش ساده است؛ عمقی که سازمانت لازم دارد از همان زیر ساخته شده.</h2></div><p>کاربر مجبور نیست Data Scientist باشد. ولی معماری محصول می‌تواند از یک فایل کوچک شروع کند و بعداً به حافظه‌ی تصمیم یک تیم تبدیل شود.</p></div><div className="adoption-grid"><div><b>۰۱</b><strong>ورود</strong><span>فایل کاری واقعی، نه demo data.</span></div><div><b>۰۲</b><strong>فهم</strong><span>سلامت داده، سیگنال و اولویت.</span></div><div><b>۰۳</b><strong>تصمیم</strong><span>اقدام، مالک و نتیجه مورد انتظار.</span></div><div><b>۰۴</b><strong>یادگیری</strong><span>Outcome و حافظه سازمانی.</span></div></div></section>
+    <section className="ln-section" id="pricing"><div className="ln-pricing"><div><span className="ln-eyebrow">START SMALL · SCALE WITH THE WORK</span><h3>با یک فایل شروع کن.</h3><p>۳ تحلیل رایگان. بعد، ظرفیت بیشتر را بر اساس حجم واقعی کار فعال کن.</p></div><div className="ln-pricing-side"><Link href="/signup" className="ln-primary">تحلیل اول رایگان ←</Link><span>بدون کارت بانکی · بدون قرارداد</span></div></div></section>
 
-    <section className="pricing-section" id="pricing"><div><small>START SMALL · SCALE WITH THE WORK</small><h2>یک فایل واقعی بیاور؛ تفاوت را خودت ببین.</h2><p>۳ تحلیل رایگان برای شروع. بدون قرارداد، بدون کارت بانکی و بدون نیاز به ساختن data stack جدید.</p></div><div className="pricing-actions"><Link className="primary" href="/signup">اولین تحلیل رایگان <span>←</span></Link><span>۳ تحلیل · بدون کارت بانکی</span></div></section>
-
-    <footer className="site-footer"><Link className="wordmark" href="/"><span>O</span><strong>OMIND</strong></Link><div><a href="#product">Product</a><a href="#solutions">Solutions</a><a href="#pricing">Pricing</a></div><span>Data × AI × Decisions · © 2026</span></footer>
+    <footer className="ln-footer"><Link href="/" className="ln-brand"><span className="ln-brand-mark">O</span><span className="ln-brand-copy"><strong>OMIND</strong><span>Data × AI × Decisions</span></span></Link><nav><a href="#product">Product</a><a href="#solutions">Solutions</a><a href="#proof">Trust</a><a href="#pricing">Pricing</a></nav><small>© 2026 OMIND</small></footer>
   </main>;
 }
