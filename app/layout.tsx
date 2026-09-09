@@ -2,8 +2,9 @@ import './globals.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'OMIND — فایل را بده، تصمیم را بگیر',
-  description: 'تحلیل سریع Excel و CSV برای مدیرها و تیم‌ها؛ از داده تا سؤال و اقدام بعدی.',
+  title: 'OMIND — Decision Intelligence for Teams',
+  description: 'OMIND داده‌های کاری را به سیگنال، اولویت، تصمیم و اقدام بعدی تبدیل می‌کند.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
