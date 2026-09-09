@@ -19,13 +19,13 @@ The reasoning layer converts observed evidence into a traceable priority, decisi
 
 Every module emits input, output, confidence and trace. No module is allowed to claim causality from correlation alone.
 
-## Fibonacci weighting
-The sequence `1,1,2,3,5,8,13,21,34,55,89` is used as an explicit weighting mechanism for ranked evidence. The implementation exposes sensitivity testing so weighting effects can be measured rather than treated as decoration.
+## Ranking model
+Production ranking uses a deterministic evidence score plus an explicit priority weight. Ranking is independent of input order and does not use arbitrary positional multipliers. This keeps the score interpretable and monotonic: stronger evidence or a higher priority cannot be penalized merely because of array position.
 
 ## Acceptance criteria
 - Exactly 12 modules execute in order.
 - Each execution has a typed contract and trace.
-- Ranking is deterministic for identical input.
-- Fibonacci weighting changes the ranking score in a measurable way.
+- Ranking is deterministic and independent of input order.
+- Priority weighting is explicit and auditable.
 - Causal uncertainty is explicitly surfaced.
 - Actions include validation and feedback rather than pretending every signal is a conclusion.
