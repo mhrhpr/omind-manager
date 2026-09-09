@@ -33,8 +33,13 @@ function fibWeight(index: number) { return FIBONACCI[Math.min(index, FIBONACCI.l
 function clamp(n: number, min = 0, max = 100) { return Math.max(min, Math.min(max, Math.round(n))); }
 
 export function rankSignals(signals: SignalEvidence[]): SignalEvidence[] {
-  return [...signals].map((s, i) => ({ ...s, score: clamp(s.score * fibWeight(Math.min(i + 1, 10)) / 13) }))
-    .sort((a, b) => b.score - a.score);
+  const base = [...signals]
+    .map(s => ({ ...s, score: clamp(s.score) }))
+    .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title));
+
+  return base
+    .map((s, i) => ({ ...s, score: clamp(s.score * fibWeight(Math.min(i + 1, 10)) / 13) }))
+    .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title));
 }
 
 export function runReasoning(signals: SignalEvidence[], question: string): ReasoningResult {
