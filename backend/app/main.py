@@ -2,6 +2,7 @@ import json
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -11,7 +12,14 @@ from .schemas import AnalysisResponse, DecisionCreate, DecisionOutcomeUpdate, De
 from .settings import settings
 from .storage import storage
 
-app = FastAPI(title=settings.app_name, version='0.2.0')
+app = FastAPI(title=settings.app_name, version='0.2.1')
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origin_list,
+    allow_credentials=True,
+    allow_methods=['GET', 'POST', 'PATCH'],
+    allow_headers=['*'],
+)
 
 
 @app.on_event('startup')
@@ -79,8 +87,14 @@ async def create_analysis(
         raise HTTPException(422, 'result_json must be valid JSON') from exc
     if not isinstance(result, dict):
         raise HTTPException(422, 'result_json must be an object')
-    if db.get(WorkspaceRecord, workspace_id) is None:
-        raise HTTPException(404, 'workspace not found')
+
+    workspace = db.get(WorkspaceRecord, workspace_id, with_for_update=True)
+    if workspace is None:
+        workspace = WorkspaceRecord(id=workspace_id)
+        db.add(workspace)
+        db.flush()
+    if workspace.analyses_used >= workspace.analysis_limit:
+        raise HTTPException(402, 'analysis quota exhausted')
 
     key = storage.put(file.filename, content)
     record = AnalysisRecord(
@@ -94,6 +108,7 @@ async def create_analysis(
         confidence=int(result.get('confidence', 0)),
         result_json=result,
     )
+    workspace.analyses_used += 1
     db.add(record)
     db.commit()
     db.refresh(record)
