@@ -8,6 +8,7 @@ import './landing-next.css'
 import './playground.css'
 import './bi-workspace.css'
 import './omind-decision-v2.css'
+import './omind-decision-v3.css'
 import type { Metadata } from 'next'
 import PointerFX from './PointerFX'
 
