@@ -7,10 +7,21 @@ from sqlalchemy.orm import Mapped, mapped_column
 from .db import Base
 
 
+class WorkspaceRecord(Base):
+    __tablename__ = 'workspace_records'
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    plan: Mapped[str] = mapped_column(String(32), default='free')
+    analysis_limit: Mapped[int] = mapped_column(Integer, default=3)
+    analyses_used: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class AnalysisRecord(Base):
     __tablename__ = 'analysis_records'
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    workspace_id: Mapped[UUID] = mapped_column(index=True)
     filename: Mapped[str] = mapped_column(String(255))
     question: Mapped[str] = mapped_column(Text)
     raw_file_key: Mapped[str] = mapped_column(String(512))
