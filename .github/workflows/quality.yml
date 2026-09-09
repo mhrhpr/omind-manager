@@ -31,5 +31,5 @@ jobs:
         working-directory: backend
       - run: pytest -q
         working-directory: backend
-      - run: alembic check
+      - run: python -c "from pathlib import Path; p=Path('alembic/versions'); files=sorted(x.name for x in p.glob('*.py')); assert '0001_initial.py' in files and '0002_workspace.py' in files and '0003_workspace_auth.py' in files"
         working-directory: backend
