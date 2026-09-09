@@ -7,6 +7,7 @@ import './omind-console.css'
 import './landing-next.css'
 import './playground.css'
 import type { Metadata } from 'next'
+import PointerFX from './PointerFX'
 
 export const metadata: Metadata = {
   title: 'OMIND — Decision Intelligence for Teams',
@@ -15,5 +16,5 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="fa" dir="rtl"><body>{children}</body></html>
+  return <html lang="fa" dir="rtl"><body><PointerFX />{children}</body></html>
 }
