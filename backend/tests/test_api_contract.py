@@ -19,6 +19,9 @@ def test_product_routes_are_exposed() -> None:
     assert '/analyses/{analysis_id}' in routes
     assert '/decisions' in routes
     assert '/decisions/{decision_id}/outcome' in routes
+    assert '/auth/signup' in routes
+    assert '/auth/login' in routes
+    assert '/auth/me' in routes
 
 
 def test_tokens_are_random_and_hashed() -> None:
@@ -43,8 +46,13 @@ def test_invalid_workspace_auth_is_rejected() -> None:
     class FakeDB:
         def get(self, *_args, **_kwargs):
             class Workspace:
+                id = uuid4()
                 auth_token_hash = hash_token('expected')
             return Workspace()
+
+        def scalar(self, *_args, **_kwargs):
+            return None
+
     try:
         require_workspace(uuid4(), 'Bearer wrong', FakeDB())
     except HTTPException as exc:
