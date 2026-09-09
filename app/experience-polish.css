@@ -1,0 +1,33 @@
+/* OMIND experience polish: larger navigation, cinematic full-screen hero, simpler decision workspace */
+.landing-vnext{min-height:100svh}
+.ln-hero{width:100%;max-width:none;min-height:100svh;margin:0;border:0;border-radius:0;padding:0 clamp(28px,5vw,80px) 64px;background:linear-gradient(180deg,rgba(249,252,255,.94) 0%,rgba(239,245,250,.9) 100%);overflow:hidden}
+.ln-hero:before{inset:-12%;background:radial-gradient(circle at 76% 16%,rgba(63,126,232,.18),transparent 25%),radial-gradient(circle at 26% 76%,rgba(22,162,123,.10),transparent 24%),radial-gradient(circle at 52% 48%,rgba(255,255,255,.85),transparent 32%);filter:blur(2px)}
+.ln-hero:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,rgba(255,255,255,.38),transparent 28%,transparent 72%,rgba(80,125,180,.08));backdrop-filter:blur(2px);z-index:-1}
+.ln-nav{width:min(1480px,100%);height:92px;margin:0 auto;border-bottom:1px solid rgba(188,205,219,.72);grid-template-columns:270px 1fr 270px;padding:0 6px;gap:24px}
+.ln-brand-mark{width:48px;height:48px;border-radius:14px;font-size:18px;box-shadow:0 16px 34px rgba(42,111,228,.22)}
+.ln-brand-copy strong{font-size:16px}.ln-brand-copy span{font-size:9px}
+.ln-nav-links{gap:32px}.ln-nav-links a{font-size:11px;font-weight:800;padding:14px 4px}
+.ln-nav-actions{gap:12px}.ln-login{font-size:11px;padding:12px}.ln-cta{font-size:11px;padding:13px 18px;border-radius:13px}
+.ln-hero-grid{width:min(1480px,100%);min-height:calc(100svh - 92px);margin:0 auto;padding:clamp(52px,7vh,86px) 8px 48px;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:clamp(48px,6vw,96px)}
+.ln-hero-copy{max-width:690px}.ln-kicker{font-size:10px}.ln-hero h1{font-size:clamp(58px,7vw,96px);letter-spacing:-5px;margin:20px 0}
+.ln-hero-copy>p{font-size:15px;max-width:650px}.ln-hero-actions{margin-top:28px}.ln-primary,.ln-secondary{font-size:11px;padding:15px 18px}
+.ln-proof-mini span{font-size:8px}.ln-proof-mini small{font-size:9px}.ln-hero-tagline{font-size:9px;margin-top:28px}
+.ln-hero-product{min-height:620px}.ln-product-halo{width:700px;height:700px;filter:blur(8px);opacity:.9}.ln-product-shell{width:min(760px,100%);transform:perspective(1500px) rotateY(-3deg) rotateX(1deg);box-shadow:0 46px 120px rgba(18,54,84,.2)}
+.ln-float-chip{font-size:8px;padding:12px 14px;backdrop-filter:blur(18px);background:rgba(255,255,255,.74)}.ln-float-chip b{font-size:10px}
+
+/* Workspace */
+.omind-playground{min-height:100svh;background:radial-gradient(circle at 78% 5%,color-mix(in srgb,var(--pg-accent) 12%,transparent),transparent 26%),linear-gradient(180deg,#f8fbfd,#eef4f8);color:#112b44}
+.pg-top{height:86px;padding:0 clamp(22px,4vw,58px);background:rgba(249,252,255,.8);border-bottom:1px solid rgba(204,218,228,.9);backdrop-filter:blur(22px)}
+.pg-brand>b{width:46px;height:46px;border-radius:13px;font-size:16px}.pg-brand span{font-size:15px}.pg-brand small{font-size:8px}
+.pg-nav{justify-content:center;gap:8px}.pg-nav span{font-size:9px;padding:8px 12px;border-radius:999px;background:#f0f5f8}.pg-nav .pg-mode{color:#178a6b;background:#eaf8f2;border-color:#c8e7dc}
+.pg-exit{font-size:11px;padding:10px 14px;border:1px solid #d6e1e8;border-radius:11px;background:#fff}
+.pg-layout{display:block;max-width:none;min-height:calc(100svh - 86px)}.pg-side{display:none}.pg-main{max-width:1500px;padding:54px clamp(18px,4vw,64px) 90px}
+.pg-hero{min-height:33svh;align-items:center;padding:18px 4px}.pg-kicker{font-size:9px}.pg-hero h1{font-size:clamp(48px,6.3vw,82px);margin:16px 0 12px}.pg-hero p{font-size:14px;max-width:850px}.pg-score{min-width:210px;padding:20px 18px;border-radius:18px;box-shadow:0 20px 50px rgba(28,62,89,.09)}.pg-score span{font-size:8px}.pg-score b{font-size:38px}
+.pg-upload-card{margin-top:14px;padding:22px;grid-template-columns:minmax(340px,.82fr) minmax(0,1.18fr);gap:22px;border-radius:24px;box-shadow:0 24px 70px rgba(27,60,86,.09)}
+.pg-drop{min-height:265px;border-radius:19px}.pg-upload-glyph{width:58px;height:58px;font-size:30px}.pg-drop strong{font-size:18px}.pg-controls{padding:10px}.pg-controls label{font-size:10px}.pg-controls select,.pg-controls textarea{padding:13px;font-size:12px}.pg-controls textarea{min-height:108px}.pg-run{padding:16px;font-size:12px;cursor:pointer}
+.pg-error{font-size:10px}.pg-pipeline,.pg-result,.pg-panel,.pg-model{border-radius:22px}.pg-pipeline{padding:22px}.pg-pipeline-head h2{font-size:26px}.pg-steps>div{min-height:82px;padding:14px}.pg-steps b{font-size:10px}
+.pg-result{padding:26px}.pg-result h2{font-size:32px}.pg-result p{font-size:11px;max-width:900px}.pg-health{min-width:190px;padding:16px}.pg-health b{font-size:34px}.pg-metrics{gap:11px}.pg-metrics div{padding:16px}.pg-metrics b{font-size:21px}
+.pg-panel{padding:22px}.pg-panel h3{font-size:23px}.pg-model{padding:26px}.pg-model-head h2{font-size:26px}.pg-model-grid{gap:10px}.pg-model-grid>div{min-height:112px;padding:15px}.pg-model-grid b{font-size:17px}
+.pg-trace{margin-top:16px;padding:16px;border-radius:17px}
+@media(max-width:1100px){.ln-nav{grid-template-columns:220px 1fr 190px}.ln-nav-links{gap:16px}.ln-hero-grid{grid-template-columns:1fr;min-height:auto}.ln-hero-copy{max-width:none}.ln-hero-product{min-height:560px}.pg-hero{min-height:auto}.pg-upload-card{grid-template-columns:1fr}}
+@media(max-width:760px){.ln-hero{padding:0 16px 40px}.ln-nav{height:76px;grid-template-columns:1fr auto}.ln-nav-links{display:none}.ln-nav-actions .ln-login{display:none}.ln-brand-mark{width:40px;height:40px}.ln-brand-copy strong{font-size:14px}.ln-hero-grid{padding:40px 0 20px}.ln-hero h1{font-size:47px;letter-spacing:-3px}.ln-hero-copy>p{font-size:13px}.ln-hero-actions{flex-direction:column;align-items:stretch}.ln-primary,.ln-secondary{width:100%}.ln-hero-product{min-height:420px}.ln-product-shell{transform:none}.ln-float-chip{display:none}.pg-top{height:72px;padding:0 14px}.pg-nav{display:none}.pg-main{padding:32px 13px 60px}.pg-hero h1{font-size:44px}.pg-score{width:100%;min-width:0}.pg-upload-card{padding:13px}.pg-steps,.pg-model-grid{grid-template-columns:1fr}.pg-metrics,.pg-report-grid{grid-template-columns:repeat(2,1fr)}.pg-grid{grid-template-columns:1fr}.pg-result-head{flex-direction:column}}
