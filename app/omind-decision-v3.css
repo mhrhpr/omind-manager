@@ -1,0 +1,11 @@
+/* OMIND workspace interaction layer — mobile navigation + keyboard QA */
+.bi-sidebar nav button:focus-visible,.bi-import button:focus-visible,.bi-import label:focus-within,.bi-home:focus-visible{outline:2px solid #64a8ff;outline-offset:2px}
+@media(max-width:680px){
+  .bi-app{padding-bottom:82px!important}
+  .bi-sidebar{position:fixed!important;left:0;right:0;bottom:0;top:auto!important;width:100%!important;height:76px!important;z-index:60!important;display:block!important;padding:7px 8px!important;background:rgba(7,11,16,.96)!important;border:0!important;border-top:1px solid #21303e!important;backdrop-filter:blur(22px)!important;box-shadow:0 -16px 42px rgba(0,0,0,.28)!important}
+  .bi-sidebar>.bi-logo,.bi-sidebar>.bi-workspace,.bi-sidebar>.bi-side-foot{display:none!important}
+  .bi-sidebar nav{height:100%;display:grid!important;grid-template-columns:repeat(5,1fr)!important;gap:4px!important}
+  .bi-sidebar nav button{min-height:60px!important;height:60px!important;padding:5px 3px!important;border-radius:11px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:4px!important;text-align:center!important;font-size:11px!important;line-height:1.2!important}
+  .bi-sidebar nav i{width:27px!important;height:27px!important;font-size:14px!important}
+}
+@media(prefers-reduced-motion:reduce){.bi-app *{transition:none!important;scroll-behavior:auto!important}}
