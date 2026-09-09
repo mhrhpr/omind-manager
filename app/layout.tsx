@@ -4,6 +4,7 @@ import './enterprise-ui.css'
 import './omind-next.css'
 import './omind-platform.css'
 import './omind-console.css'
+import './landing-next.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
