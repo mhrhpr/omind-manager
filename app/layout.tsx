@@ -6,6 +6,7 @@ import './omind-platform.css'
 import './omind-console.css'
 import './landing-next.css'
 import './playground.css'
+import './experience-polish.css'
 import type { Metadata } from 'next'
 import PointerFX from './PointerFX'
 
