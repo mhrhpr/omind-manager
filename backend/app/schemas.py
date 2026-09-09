@@ -6,7 +6,6 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class WorkspaceResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
     id: UUID
     plan: str
     analysis_limit: int
@@ -14,9 +13,12 @@ class WorkspaceResponse(BaseModel):
     remaining: int
 
 
+class WorkspaceBootstrap(WorkspaceResponse):
+    access_token: str
+
+
 class AnalysisResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
     id: UUID
     workspace_id: UUID
     filename: str
@@ -48,7 +50,6 @@ class DecisionOutcomeUpdate(BaseModel):
 
 class DecisionResponse(DecisionCreate):
     model_config = ConfigDict(from_attributes=True)
-
     id: UUID
     actual_outcome: str | None
     lesson: str | None
