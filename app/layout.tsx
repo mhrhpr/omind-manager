@@ -1,6 +1,7 @@
 import './globals.css'
 import './ui-overrides.css'
 import './enterprise-ui.css'
+import './omind-next.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
