@@ -14,7 +14,7 @@ class WorkspaceRecord(Base):
     plan: Mapped[str] = mapped_column(String(32), default='free')
     analysis_limit: Mapped[int] = mapped_column(Integer, default=3)
     analyses_used: Mapped[int] = mapped_column(Integer, default=0)
-    auth_token_hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, default=lambda: '')
+    auth_token_hash: Mapped[str | None] = mapped_column(String(64), nullable=True, unique=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
