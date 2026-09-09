@@ -1,3 +1,5 @@
+import { runReasoning, type ReasoningResult } from './reasoning';
+
 export type Cell = string | number | boolean | null;
 export type Row = Record<string, Cell>;
 
@@ -28,6 +30,7 @@ export type Analysis = {
   actions: string[];
   confidence: number;
   trace: string[];
+  reasoning: ReasoningResult;
 };
 
 const numeric = (v: Cell) => typeof v === 'number' && Number.isFinite(v);
@@ -48,7 +51,7 @@ export function normalizeRows(rows: Row[]): Row[] {
   })));
 }
 
-export function profileRows(input: Row[]): Analysis {
+export function profileRows(input: Row[], question = ''): Analysis {
   const rows = normalizeRows(input);
   const names = [...new Set(rows.flatMap(r => Object.keys(r)))];
   const columns: ColumnProfile[] = names.map(name => {
@@ -61,7 +64,7 @@ export function profileRows(input: Row[]): Analysis {
     let role: ColumnProfile['role'] = 'text';
     let type: ColumnProfile['type'] = 'text';
     if (dateRatio >= .7 || /date|time|تاریخ|روز|ماه|سال/.test(lower)) { role = 'date'; type = 'date'; }
-    else if (numericRatio >= .8) { role = unique === values.length && unique > 1 ? 'measure' : 'measure'; type = 'number'; }
+    else if (numericRatio >= .8) { role = 'measure'; type = 'number'; }
     else if (unique <= Math.max(20, rows.length * .1)) { role = 'category'; type = 'text'; }
     else role = 'text';
     if (/^id$|_id$|code|شناسه|کد/.test(lower) || unique === rows.length) role = 'key';
@@ -95,20 +98,32 @@ export function profileRows(input: Row[]): Analysis {
     signals.push({ type: 'concentration', title: `تمرکز قابل بررسی در ${categories[0]}`, detail: `می‌توان ${measures[0]} را بین دسته‌های ${categories[0]} مقایسه کرد.`, priority: 'low', score: 21 });
   }
 
-  signals.sort((a, b) => b.score - a.score);
+  signals.sort((a, b) => b.score - a.score || a.title.localeCompare(b.title));
   const questions = [
     ...measures.slice(0, 2).map(m => `روند ${m} در طول زمان چگونه تغییر کرده است؟`),
     ...categories.slice(0, 2).map(c => `کدام ${c} عملکرد ضعیف‌تری دارد؟`),
     'مهم‌ترین ناهنجاری یا تغییر غیرعادی این داده چیست؟',
     'کدام مسئله بیشترین اثر احتمالی را روی نتیجه دارد؟',
   ].slice(0, 6);
-  const priorities = signals.slice(0, 3).map(s => s.title);
-  const hypotheses = signals.slice(0, 3).map(s => `فرضیه: ${s.detail}`);
-  const actions = [
-    health < 80 ? 'ابتدا Cleaning Preview را بررسی و داده‌های مشکل‌دار را تأیید کن.' : 'یک سیگنال با اولویت بالا را برای تحلیل عمیق‌تر انتخاب کن.',
-    'فرضیه منتخب را با یک مقایسه یا آزمایش کوچک اعتبارسنجی کن.',
-    'نتیجه واقعی اقدام را ثبت کن تا در Decision Memory قابل استفاده باشد.',
-  ];
-  const confidence = Math.max(35, Math.min(96, Math.round(health * .7 + Math.min(30, rows.length / 20))));
-  return { rows: rows.length, columns, health, signals, questions, priorities, hypotheses, actions, confidence, trace: ['01 Intake', '02 Observe', '03 Decompose', '04 Pattern', '05 Hypothesis', '06 Causality', '07 Decision Model', '08 Scenarios', '09 Experiment', '10 Action', '11 Feedback', '12 Loop'] };
+
+  const resolvedQuestion = question.trim() || questions[0] || 'مهم‌ترین مسئله این داده چیست؟';
+  const reasoning = runReasoning(
+    signals.map(s => ({ title: s.title, score: s.score, priority: s.priority, evidence: s.detail })),
+    resolvedQuestion,
+  );
+
+  const confidence = reasoning.confidence;
+  return {
+    rows: rows.length,
+    columns,
+    health,
+    signals,
+    questions,
+    priorities: reasoning.priorities,
+    hypotheses: reasoning.hypotheses,
+    actions: reasoning.actions,
+    confidence,
+    trace: reasoning.steps.map(step => step.trace),
+    reasoning,
+  };
 }
