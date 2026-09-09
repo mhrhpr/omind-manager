@@ -13,15 +13,19 @@ def test_health_route_is_exposed() -> None:
 
 def test_product_routes_are_exposed() -> None:
     routes = {route.path for route in app.routes}
-    assert '/workspaces' in routes
-    assert '/workspaces/{workspace_id}/analyses' in routes
-    assert '/analyses' in routes
-    assert '/analyses/{analysis_id}' in routes
-    assert '/decisions' in routes
-    assert '/decisions/{decision_id}/outcome' in routes
-    assert '/auth/signup' in routes
-    assert '/auth/login' in routes
-    assert '/auth/me' in routes
+    expected = {
+        '/workspaces',
+        '/workspaces/{workspace_id}/analyses',
+        '/analyses',
+        '/analyses/{analysis_id}',
+        '/analyses/{analysis_id}/charts',
+        '/decisions',
+        '/decisions/{decision_id}/outcome',
+        '/auth/signup',
+        '/auth/login',
+        '/auth/me',
+    }
+    assert expected.issubset(routes)
 
 
 def test_tokens_are_random_and_hashed() -> None:
