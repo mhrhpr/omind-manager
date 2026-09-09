@@ -8,10 +8,7 @@ import re
 
 
 _NULL_TOKENS = {"", "null", "none", "n/a", "na", "nan", "-", "—"}
-_DIGIT_TABLE = str.maketrans(
-    "۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩",
-    "01234567890123456789",
-)
+_DIGIT_TABLE = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")
 
 
 def normalize_header(value: Any) -> str:
@@ -48,16 +45,9 @@ def normalize_cell(value: Any) -> Any:
 
 def clean_rows(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if not rows:
-        return [], {
-            "input_rows": 0,
-            "output_rows": 0,
-            "removed_duplicate_rows": 0,
-            "normalized_cells": 0,
-            "empty_cells": 0,
-            "changed_headers": 0,
-        }
+        return [], {"input_rows": 0, "output_rows": 0, "removed_duplicate_rows": 0, "normalized_cells": 0, "empty_cells": 0, "changed_headers": 0}
 
-    original_headers = []
+    original_headers: list[Any] = []
     for row in rows:
         for key in row.keys():
             if key not in original_headers:
@@ -78,7 +68,6 @@ def clean_rows(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[s
     cleaned: list[dict[str, Any]] = []
     seen: set[str] = set()
     removed_duplicates = 0
-
     for row in rows:
         clean: dict[str, Any] = {}
         for raw_key, raw_value in row.items():
@@ -95,14 +84,7 @@ def clean_rows(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[s
         seen.add(fingerprint)
         cleaned.append(clean)
 
-    return cleaned, {
-        "input_rows": len(rows),
-        "output_rows": len(cleaned),
-        "removed_duplicate_rows": removed_duplicates,
-        "normalized_cells": normalized_cells,
-        "empty_cells": empty_cells,
-        "changed_headers": changed_headers,
-    }
+    return cleaned, {"input_rows": len(rows), "output_rows": len(cleaned), "removed_duplicate_rows": removed_duplicates, "normalized_cells": normalized_cells, "empty_cells": empty_cells, "changed_headers": changed_headers}
 
 
 def _date_value(value: Any) -> datetime | None:
@@ -120,7 +102,6 @@ def _date_value(value: Any) -> datetime | None:
 def validate_rows(rows: list[dict[str, Any]], cleaning: dict[str, Any]) -> dict[str, Any]:
     if not rows:
         return {"valid": False, "score": 0, "columns": [], "warnings": ["داده قابل تحلیل وجود ندارد."]}
-
     names: list[str] = []
     for row in rows:
         for key in row:
@@ -131,7 +112,6 @@ def validate_rows(rows: list[dict[str, Any]], cleaning: dict[str, Any]) -> dict[
     missing_cells = 0
     columns: list[dict[str, Any]] = []
     warnings: list[str] = []
-
     for name in names:
         values = [row.get(name) for row in rows]
         present = [v for v in values if v not in (None, "")]
@@ -155,12 +135,10 @@ def validate_rows(rows: list[dict[str, Any]], cleaning: dict[str, Any]) -> dict[
     duplicate_rate = cleaning["removed_duplicate_rows"] / max(1, cleaning["input_rows"])
     warning_penalty = min(25, len(warnings) * 3)
     score = max(0, round(100 - missing_rate * 55 - duplicate_rate * 25 - warning_penalty))
-    valid = score >= 60 and any(c["type"] in {"number", "date"} for c in columns)
-    if not any(c["type"] == "number" for c in columns):
+    valid = score >= 60 and any(c["type"] == "number" for c in columns)
+    if not valid and not any(c["type"] == "number" for c in columns):
         warnings.append("هیچ measure عددی قابل اتکایی برای تحلیل کمی پیدا نشد.")
-        valid = False
         score = max(0, score - 10)
-
     return {"valid": valid, "score": score, "columns": columns, "warnings": warnings}
 
 
@@ -170,7 +148,6 @@ def build_semantic_model(rows: list[dict[str, Any]]) -> dict[str, Any]:
         for key in row:
             if key not in names:
                 names.append(key)
-
     measures: list[str] = []
     dimensions: list[str] = []
     date_columns: list[str] = []
@@ -181,31 +158,21 @@ def build_semantic_model(rows: list[dict[str, Any]]) -> dict[str, Any]:
         date_ratio = sum(_date_value(v) is not None for v in values) / max(1, len(values))
         unique = len({repr(v) for v in values})
         lower = name.lower()
-        if lower == "id" or lower.endswith("_id") or "شناسه" in lower or "کد" in lower or unique == len(values):
-            key_candidates.append(name)
-        elif date_ratio >= 0.7:
+        if date_ratio >= 0.7:
             date_columns.append(name)
-        elif numeric_ratio >= 0.8:
+        elif numeric_ratio >= 0.8 and not (lower == "id" or lower.endswith("_id") or "شناسه" in lower or "کد" in lower):
             measures.append(name)
+        elif lower == "id" or lower.endswith("_id") or "شناسه" in lower or "کد" in lower or unique == len(values):
+            key_candidates.append(name)
         else:
             dimensions.append(name)
-
     key = key_candidates[0] if key_candidates else None
-    grain = "one row per record" if key else "one row per observation"
     relationships = []
     if key and dimensions:
         relationships.append({"from": key, "to": dimensions[0], "type": "candidate-dimension"})
     if date_columns and measures:
         relationships.append({"from": date_columns[0], "to": measures[0], "type": "time-series"})
-
-    return {
-        "grain": grain,
-        "key": key,
-        "date_column": date_columns[0] if date_columns else None,
-        "measures": measures,
-        "dimensions": dimensions,
-        "relationships": relationships,
-    }
+    return {"grain": "one row per record" if key else "one row per observation", "key": key, "date_column": date_columns[0] if date_columns else None, "measures": measures, "dimensions": dimensions, "relationships": relationships}
 
 
 def build_pipeline(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
@@ -216,24 +183,8 @@ def build_pipeline(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], di
 
 
 def enrich_analysis(result: dict[str, Any], rows: list[dict[str, Any]], pipeline: dict[str, Any]) -> dict[str, Any]:
-    result = dict(result)
-    result["pipeline"] = pipeline
-    result["dataset"] = {
-        "raw_rows": pipeline["cleaning"]["input_rows"],
-        "clean_rows": pipeline["cleaning"]["output_rows"],
-        "columns": len(pipeline["validation"]["columns"]),
-        "missing_cells": pipeline["cleaning"]["empty_cells"],
-        "duplicate_rows_removed": pipeline["cleaning"]["removed_duplicate_rows"],
-    }
-    result["decision_contract"] = {
-        "status": "ready" if pipeline["validation"]["valid"] and result.get("signals") else "investigate",
-        "question": result.get("resolved_question", ""),
-        "top_signal": result.get("signals", [None])[0],
-        "recommended_action": (result.get("actions") or ["شواهد بیشتری جمع‌آوری کن."])[0],
-        "confidence": result.get("confidence", 0),
-        "guardrails": [
-            "Correlation is evidence of association, not causation.",
-            "Economic impact requires a business baseline or target.",
-        ],
-    }
-    return result
+    enriched = dict(result)
+    enriched["pipeline"] = pipeline
+    enriched["dataset"] = {"raw_rows": pipeline["cleaning"]["input_rows"], "clean_rows": pipeline["cleaning"]["output_rows"], "columns": len(pipeline["validation"]["columns"]), "missing_cells": pipeline["cleaning"]["empty_cells"], "duplicate_rows_removed": pipeline["cleaning"]["removed_duplicate_rows"]}
+    enriched["decision_contract"] = {"status": "ready" if pipeline["validation"]["valid"] and enriched.get("signals") else "investigate", "question": enriched.get("resolved_question", ""), "top_signal": enriched.get("signals", [None])[0], "recommended_action": (enriched.get("actions") or ["شواهد بیشتری جمع‌آوری کن."])[0], "confidence": enriched.get("confidence", 0), "guardrails": ["Correlation is evidence of association, not causation.", "Economic impact requires a business baseline or target."]}
+    return enriched
