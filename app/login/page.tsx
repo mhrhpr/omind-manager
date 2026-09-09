@@ -28,22 +28,39 @@ export default function LoginPage() {
   }
 
   return <main className="auth-screen">
-    <div className="auth-orbit" aria-hidden="true" />
+    <div className="auth-backdrop-flow" aria-hidden="true">
+      <div className="auth-backdrop-glow auth-backdrop-glow-a" />
+      <div className="auth-backdrop-glow auth-backdrop-glow-b" />
+      <svg viewBox="0 0 1440 900" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="backdropBlue" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#2d75ea" stopOpacity="0"/><stop offset=".5" stopColor="#2d75ea" stopOpacity=".6"/><stop offset="1" stopColor="#75b1ff" stopOpacity="0"/></linearGradient>
+          <linearGradient id="backdropMint" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#169d7b" stopOpacity="0"/><stop offset=".5" stopColor="#169d7b" stopOpacity=".45"/><stop offset="1" stopColor="#8fd9c6" stopOpacity="0"/></linearGradient>
+        </defs>
+        <path className="backdrop-path blue" d="M-30 620 C220 430 380 760 610 560 S980 430 1470 610" />
+        <path className="backdrop-path mint" d="M-30 690 C230 810 430 450 690 620 S1060 790 1470 500" />
+        <path className="backdrop-path blue faint" d="M-20 310 C240 470 420 160 690 340 S1080 460 1470 250" />
+      </svg>
+      <div className="backdrop-beacon beacon-one" />
+      <div className="backdrop-beacon beacon-two" />
+      <div className="backdrop-beacon beacon-three" />
+    </div>
+
     <section className="auth-card">
       <Link href="/" className="auth-brand"><span>O</span><b>OMIND</b></Link>
-      <div className="auth-copy"><small>DECISION INTELLIGENCE</small><h1>دوباره وارد جریان تصمیم شو.</h1><p>به workspace برگرد و تحلیل‌ها، تصمیم‌ها و نتایج واقعی خودت را ادامه بده.</p></div>
+      <div className="auth-copy"><small>DECISION INTELLIGENCE</small><h1>دوباره وارد جریان تصمیم شو.</h1><p>جایی که داده‌های پراکنده به یک تصویر روشن، یک اولویت مشخص و یک اقدام قابل پیگیری تبدیل می‌شوند.</p></div>
       <form onSubmit={submit} className="auth-form">
         <label>ایمیل کاری<input type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" required placeholder="you@company.com" /></label>
         <label>رمز عبور<input type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" required placeholder="••••••••" /></label>
         {error && <div className="form-error">{error}</div>}
         <button className="primary auth-submit" disabled={busy}>{busy ? 'در حال ورود…' : 'ورود به workspace'}</button>
       </form>
-      <p className="auth-foot">حساب OMIND نداری؟ <Link href="/signup">ساخت workspace رایگان</Link></p>
+      <p className="auth-foot">حساب OMIND نداری؟ <Link href="/signup">اولین workspace را رایگان بساز</Link></p>
     </section>
+
     <section className="auth-side" aria-label="OMIND decision flow">
       <span>01 · DECISION FLOW</span>
-      <b>از داده خام تا تصمیم قابل پیگیری.</b>
-      <p>OMIND فقط گزارش تولید نمی‌کند. شواهد را پیدا می‌کند، مسئله را اولویت‌بندی می‌کند و تصمیم را تا نتیجه واقعی دنبال می‌کند.</p>
+      <b>کمتر دنبال گزارش بگرد.<br />زودتر تصمیم بگیر.</b>
+      <p>OMIND از همان داده‌ای که امروز داری شروع می‌کند؛ سیگنال‌های مهم را بیرون می‌کشد، آن‌ها را اولویت‌بندی می‌کند و تصمیم را تا نتیجه واقعی دنبال می‌کند.</p>
       <div className="auth-flow" aria-hidden="true">
         <div className="auth-flow-orb auth-flow-orb-a" />
         <div className="auth-flow-orb auth-flow-orb-b" />
@@ -54,11 +71,10 @@ export default function LoginPage() {
           </defs>
           <g className="auth-flow-track"><path d="M0 148 C110 64 188 230 294 148 S498 70 760 148"/><path d="M0 154 C130 228 228 72 342 154 S530 222 760 145"/><path d="M0 142 C120 106 212 194 330 142 S560 104 760 153"/></g>
         </svg>
-        <div className="auth-flow-track" />
         <div className="auth-node"><span>DATA</span><b>داده</b></div>
         <div className="auth-node is-signal"><span>SIGNAL</span><b>سیگنال</b></div>
         <div className="auth-node is-decision"><span>DECISION</span><b>تصمیم</b></div>
-        <div className="auth-node"><span>OUTCOME</span><b>نتیجه</b></div>
+        <div className="auth-node is-outcome"><span>OUTCOME</span><b>نتیجه</b></div>
         <div className="auth-flow-caption"><i/> OMIND / DECISION OS <i/></div>
         <div className="auth-flow-note">EVIDENCE FIRST · TRACEABLE · LEARNING LOOP</div>
         <div className="auth-flow-badge">LIVE SYSTEM</div>
