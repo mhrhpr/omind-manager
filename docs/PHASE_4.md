@@ -1,19 +1,18 @@
 # OMIND Phase 4 — Productization
 
 ## Delivered
-- Browser workspace gets a stable local workspace identifier.
-- Optional API mode persists analyses and reloads server-backed history.
-- Free-plan analysis quota is enforced server-side.
-- Quota consumption is atomic with analysis persistence to avoid charging failed saves.
-- Decision records support expected outcome, actual outcome, lesson and terminal feedback states: success, incomplete, failure, retest.
+- Browser workspace bootstraps a persistent server workspace credential.
+- Server-backed analysis history and decision history.
+- Free-plan quota is enforced and consumed transactionally with successful analysis persistence.
+- Decision records support expected outcome, actual outcome, lesson and feedback states: success, incomplete, failure, retest.
 - CORS is configurable through `OMIND_CORS_ORIGINS`.
 - Frontend and backend quality gates are defined in GitHub Actions.
 
 ## Security boundary
-Authentication and authorization are intentionally not claimed as complete. The workspace UUID is an anonymous product-development identity, not an account credential. Production release must put a trusted authenticated subject in front of workspace and quota routes.
+Workspace and analysis routes require a bearer credential. Access is checked against the workspace credential hash, and analysis/decision reads and mutations are constrained to that workspace. Full account lifecycle, password/email recovery and organization/team RBAC remain future product layers.
 
 ## Deployment boundary
-The repository now has the domain and persistence contracts needed for production assembly, but deployment is not certified while external Vercel builds are rate-limited and no live PostgreSQL/S3 credentials are available in this session.
+Production deployment still requires external infrastructure configuration such as PostgreSQL and object storage credentials, plus successful CI/deployment execution in the target environment.
 
 ## Product boundary
-The current core is still deterministic and provider-independent. AI can be layered on later without becoming the source of truth for data integrity or quota state.
+The deterministic core remains provider-independent. AI can be layered on later without becoming the source of truth for data integrity or quota state.

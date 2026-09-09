@@ -22,6 +22,6 @@ def require_workspace(workspace_id: UUID, authorization: str | None = Header(def
         raise HTTPException(401, 'workspace authentication required')
     token = authorization.removeprefix('Bearer ').strip()
     record = db.get(WorkspaceRecord, workspace_id)
-    if record is None or not secrets.compare_digest(record.auth_token_hash, hash_token(token)):
+    if record is None or not record.auth_token_hash or not secrets.compare_digest(record.auth_token_hash, hash_token(token)):
         raise HTTPException(403, 'workspace access denied')
     return record
