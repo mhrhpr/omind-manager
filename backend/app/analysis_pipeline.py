@@ -121,7 +121,18 @@ def validate_rows(rows: list[dict[str, Any]], cleaning: dict[str, Any]) -> dict[
         missing_cells += missing
         missing_rate = missing / len(values)
         unique = len({repr(v) for v in present})
-        inferred = "number" if present and len(numeric) / len(present) >= 0.8 else "date" if present and len(dates) / len(present) >= 0.7 else "text"
+        lower = name.lower()
+        identifier_hint = lower == "id" or lower.endswith("_id") or "شناسه" in lower or "کد" in lower
+        if not present:
+            inferred = "unknown"
+        elif date_ratio := (len(dates) / len(present)) >= 0.7:
+            inferred = "date"
+        elif numeric and not identifier_hint and len(numeric) / len(present) >= 0.8:
+            inferred = "number"
+        elif identifier_hint or unique == len(present):
+            inferred = "key"
+        else:
+            inferred = "text"
         issues: list[str] = []
         if not present:
             issues.append("column is empty")
@@ -186,5 +197,5 @@ def enrich_analysis(result: dict[str, Any], rows: list[dict[str, Any]], pipeline
     enriched = dict(result)
     enriched["pipeline"] = pipeline
     enriched["dataset"] = {"raw_rows": pipeline["cleaning"]["input_rows"], "clean_rows": pipeline["cleaning"]["output_rows"], "columns": len(pipeline["validation"]["columns"]), "missing_cells": pipeline["cleaning"]["empty_cells"], "duplicate_rows_removed": pipeline["cleaning"]["removed_duplicate_rows"]}
-    enriched["decision_contract"] = {"status": "ready" if pipeline["validation"]["valid"] and enriched.get("signals") else "investigate", "question": enriched.get("resolved_question", ""), "top_signal": enriched.get("signals", [None])[0], "recommended_action": (enriched.get("actions") or ["شواهد بیشتری جمع‌آوری کن."])[0], "confidence": enriched.get("confidence", 0), "guardrails": ["Correlation is evidence of association, not causation.", "Economic impact requires a business baseline or target."]}
+    enriched["decision_contract"] = {"status": "ready" if pipeline["validation"]["valid"] and enriched.get("signals") else "investigate", "question": enriched.get("resolved_question", ""), "top_signal": enriched.get("signals", [None])[0], "recommended_action": (enriched.get("actions") or enriched.get("recommendations") or ["شواهد بیشتری جمع‌آوری کن."])[0], "confidence": enriched.get("confidence", 0), "guardrails": enriched.get("guardrails", ["Correlation is evidence of association, not causation.", "Economic impact requires a business baseline or target."])}
     return enriched
