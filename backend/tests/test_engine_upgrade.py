@@ -1,5 +1,5 @@
 from app.auth import hash_password, verify_password
-from app.server_engine import analyze_rows
+from app.data_analyst_engine import analyze_dataset
 
 
 def test_password_round_trip() -> None:
@@ -8,13 +8,13 @@ def test_password_round_trip() -> None:
     assert not verify_password('wrong password', encoded)
 
 
-def test_engine_detects_trend_and_group_gap() -> None:
+def test_engine_detects_trend_and_segment_effect() -> None:
     rows = [
-        {'date': f'2026-01-{i:02d}', 'region': 'East' if i <= 5 else 'West', 'sales': 100 + i * 3} for i in range(1, 11)
+        {'date': f'2026-01-{i:02d}', 'region': 'East' if i <= 5 else 'West', 'sales': 100 + i * 30} for i in range(1, 11)
     ]
-    result = analyze_rows(rows, '', 'sales')
+    result = analyze_dataset(rows, question='sales')
     types = {signal['type'] for signal in result['signals']}
     assert 'trend' in types
-    assert 'concentration' in types
-    assert result['decision_readiness'] in {'ready', 'investigate', 'fix-data'}
+    assert 'segment' in types
+    assert result['decision']['readiness'] in {'ready', 'investigate', 'fix-data'}
     assert result['summary']
