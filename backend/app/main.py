@@ -10,14 +10,15 @@ from sqlalchemy.orm import Session
 from .analysis_pipeline import build_pipeline, enrich_analysis
 from .auth import create_session, current_session, current_user, hash_password, hash_token, issue_token, require_workspace, verify_password
 from .chart_engine import build_chart_specs
+from .data_analyst_engine import analyze_dataset
 from .db import get_db
 from .models import AnalysisRecord, DecisionRecord, UserRecord, WorkspaceRecord
 from .schemas import AuthPayload, AuthResponse, AnalysisResponse, DecisionCreate, DecisionOutcomeUpdate, DecisionResponse, SignupPayload, UserResponse, WorkspaceBootstrap, WorkspaceResponse
-from .server_engine import analyze_rows, parse_upload
+from .server_engine import parse_upload
 from .settings import settings
 from .storage import storage
 
-app = FastAPI(title=settings.app_name, version='1.3.0')
+app = FastAPI(title=settings.app_name, version='1.4.0')
 app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origin_list, allow_credentials=False, allow_methods=['GET', 'POST', 'PATCH'], allow_headers=['Authorization', 'Content-Type'])
 
 
@@ -49,7 +50,7 @@ def auth_response(user: UserRecord, workspace: WorkspaceRecord, token: str) -> A
 
 @app.get('/health')
 def health() -> dict[str, str]:
-    return {'status': 'ok', 'service': 'omind-api', 'version': '1.3.0'}
+    return {'status': 'ok', 'service': 'omind-api', 'version': '1.4.0'}
 
 
 @app.post('/auth/signup', response_model=AuthResponse)
@@ -138,8 +139,28 @@ async def create_analysis(file: UploadFile = File(...), question: str = Form('')
         if not pipeline['validation']['valid']:
             warning = pipeline['validation']['warnings'][0] if pipeline['validation']['warnings'] else 'ساختار داده برای تحلیل مناسب نیست.'
             raise HTTPException(422, warning)
-        result = analyze_rows(cleaned_rows, question, role)
-        result = enrich_analysis(result, cleaned_rows, pipeline)
+
+        analyst_result = analyze_dataset(
+            cleaned_rows,
+            question=question,
+            quality=pipeline['validation'],
+            semantic_model=pipeline['model'],
+        )
+        analyst_result['role'] = role
+        analyst_result['resolved_question'] = question.strip() or analyst_result.get('analyst', {}).get('focus', 'overall performance')
+        analyst_result['rows'] = analyst_result['dataset']['rows']
+        analyst_result['columns'] = [
+            {
+                'name': column['name'],
+                'role': 'measure' if column['name'] in analyst_result['dataset']['measures'] else 'dimension' if column['name'] in analyst_result['dataset']['dimensions'] else 'date' if column['name'] == analyst_result['dataset']['date_column'] else 'text',
+                'type': column.get('type', 'text'),
+                'missing': column.get('missing', 0),
+                'unique': column.get('unique', 0),
+            }
+            for column in pipeline['validation']['columns']
+        ]
+        analyst_result['health'] = pipeline['validation']['score']
+        result = enrich_analysis(analyst_result, cleaned_rows, pipeline)
         result['charts'] = build_chart_specs(cleaned_rows, result.get('columns'))
     except HTTPException:
         raise
