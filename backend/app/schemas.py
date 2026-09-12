@@ -4,6 +4,15 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 
+class AuthPayload(BaseModel):
+    email: str = Field(min_length=5, max_length=320)
+    password: str = Field(min_length=8, max_length=200)
+
+
+class SignupPayload(AuthPayload):
+    name: str = Field(min_length=2, max_length=120)
+
+
 class WorkspaceResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: UUID
@@ -15,6 +24,19 @@ class WorkspaceResponse(BaseModel):
 
 class WorkspaceBootstrap(WorkspaceResponse):
     access_token: str
+
+
+class UserResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: UUID
+    name: str
+    email: str
+
+
+class AuthResponse(BaseModel):
+    access_token: str
+    user: UserResponse
+    workspace: WorkspaceResponse
 
 
 class AnalysisResponse(BaseModel):

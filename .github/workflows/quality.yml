@@ -2,9 +2,9 @@ name: OMIND Quality Gate
 
 on:
   push:
-    branches: [main, feat/omind-production-foundation, feat/omind-reasoning-core, feat/omind-phase-3-platform, feat/omind-phase-4-productization, feat/omind-production-hardening]
+    branches: [main, feat/omind-product-rebuild, feat/omind-production-foundation, feat/omind-reasoning-core, feat/omind-phase-3-platform, feat/omind-phase-4-productization, feat/omind-production-hardening]
   pull_request:
-    branches: [main]
+    branches: [main, feat/omind-production-hardening, feat/omind-product-rebuild]
 
 jobs:
   frontend:
